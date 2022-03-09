@@ -65,7 +65,7 @@ class HomeScreen extends StatelessWidget {
                           child: SizedBox(
                             height: 50,
                             width: 50,
-                            child: Image.asset('assets/pizza.png'),
+                            child: state.pizzas[index].image,
                           ),
                         )
                     ],
@@ -88,10 +88,10 @@ class HomeScreen extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           FloatingActionButton(
-            child: const Icon(Icons.delete_forever),
-            backgroundColor: Colors.orange[800],
+            child: const Icon(Icons.local_pizza_outlined),
+            backgroundColor: Colors.orange[500],
             onPressed: () {
-              context.read<PizzaCounterCubit>().decrement(Pizza.pizzas[0]);
+              context.read<PizzaCounterCubit>().increment(Pizza.pizzas[1]);
             },
           ),
         ],
