@@ -1,9 +1,25 @@
 import 'package:bloc/bloc.dart';
+import 'package:equatable/equatable.dart';
+import 'package:flutter_bloc_pizza/models/pizza.dart';
 
-class PizzaCounterCubit extends Cubit<int> {
-  PizzaCounterCubit() : super(0);
+part 'pizza_counter_state.dart';
 
-  void increment() => emit(state + 1);
+class PizzaCounterCubit extends Cubit<PizzaCounterState> {
+  PizzaCounterCubit() : super(PizzaCounterState.initial());
 
-  void decrement() => state > 0 ? emit(state - 1) : emit(state);
+  void increment(Pizza pizza) {
+    emit(
+      state.copyWith(
+        pizzas: List.from(state.pizzas)..add(pizza),
+      ),
+    );
+  }
+
+  void decrement(Pizza pizza) {
+    emit(
+      state.copyWith(
+        pizzas: List.from(state.pizzas)..remove(pizza),
+      ),
+    );
+  }
 }

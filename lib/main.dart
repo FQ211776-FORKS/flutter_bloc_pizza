@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_bloc_pizza/cubit/pizza_counter_cubit.dart';
+import 'package:flutter_bloc_pizza/models/pizza.dart';
 
 void main() {
   runApp(const MyApp());
@@ -40,13 +41,13 @@ class HomeScreen extends StatelessWidget {
         backgroundColor: Colors.orange[800],
       ),
       body: Center(
-        child: BlocBuilder<PizzaCounterCubit, int>(
+        child: BlocBuilder<PizzaCounterCubit, PizzaCounterState>(
           builder: (context, state) {
             return Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  '$state',
+                  '${state.pizzas.length}',
                   style: const TextStyle(fontSize: 45),
                 ),
                 const SizedBox(height: 20),
@@ -57,7 +58,7 @@ class HomeScreen extends StatelessWidget {
                     alignment: Alignment.center,
                     clipBehavior: Clip.none,
                     children: [
-                      for (int index = 0; index < state; index++)
+                      for (int index = 0; index < state.pizzas.length; index++)
                         Positioned(
                           left: random.nextInt(400).toDouble(),
                           top: random.nextInt(400).toDouble(),
@@ -82,7 +83,7 @@ class HomeScreen extends StatelessWidget {
             child: const Icon(Icons.local_pizza),
             backgroundColor: Colors.orange[800],
             onPressed: () {
-              context.read<PizzaCounterCubit>().increment();
+              context.read<PizzaCounterCubit>().increment(Pizza.pizzas[0]);
             },
           ),
           const SizedBox(height: 10),
@@ -90,7 +91,7 @@ class HomeScreen extends StatelessWidget {
             child: const Icon(Icons.delete_forever),
             backgroundColor: Colors.orange[800],
             onPressed: () {
-              context.read<PizzaCounterCubit>().decrement();
+              context.read<PizzaCounterCubit>().decrement(Pizza.pizzas[0]);
             },
           ),
         ],
