@@ -1,4 +1,8 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_bloc_pizza/cubit/pizza_counter_cubit.dart';
 
 void main() {
   runApp(const MyApp());
@@ -9,58 +13,88 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) => PizzaCounterCubit(),
+        ),
+      ],
+      child: const MaterialApp(
+        title: 'Flutter BloC Pattern',
+        home: HomeScreen(),
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
+class HomeScreen extends StatelessWidget {
+  const HomeScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    var random = Random();
+
     return Scaffold(
-        appBar: AppBar(
-          title: Text(widget.title),
+      appBar: AppBar(
+        title: const Text('Pizza Counter with BloC'),
+        backgroundColor: Colors.orange[800],
+      ),
+      body: Center(
+        child: BlocBuilder<PizzaCounterCubit, int>(
+          builder: (context, state) {
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  '$state',
+                  style: const TextStyle(fontSize: 45),
+                ),
+                const SizedBox(height: 20),
+                SizedBox(
+                  height: 500,
+                  width: 500,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    clipBehavior: Clip.none,
+                    children: [
+                      for (int index = 0; index < state; index++)
+                        Positioned(
+                          left: random.nextInt(400).toDouble(),
+                          top: random.nextInt(400).toDouble(),
+                          child: SizedBox(
+                            height: 50,
+                            width: 50,
+                            child: Image.asset('assets/pizza.png'),
+                          ),
+                        )
+                    ],
+                  ),
+                ),
+              ],
+            );
+          },
         ),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              const Text(
-                'You have pushed the button this many times:',
-              ),
-              Text(
-                '$_counter',
-                style: Theme.of(context).textTheme.headline4,
-              ),
-            ],
+      ),
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          FloatingActionButton(
+            child: const Icon(Icons.local_pizza),
+            backgroundColor: Colors.orange[800],
+            onPressed: () {
+              context.read<PizzaCounterCubit>().increment();
+            },
           ),
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: _incrementCounter,
-          tooltip: 'Increment',
-          child: const Icon(Icons.add),
-        ));
+          const SizedBox(height: 10),
+          FloatingActionButton(
+            child: const Icon(Icons.delete_forever),
+            backgroundColor: Colors.orange[800],
+            onPressed: () {
+              context.read<PizzaCounterCubit>().decrement();
+            },
+          ),
+        ],
+      ),
+    );
   }
 }
