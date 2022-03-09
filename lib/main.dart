@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_bloc_pizza/cubit/pizza_counter_cubit.dart';
+import 'package:flutter_bloc_pizza/blocs/pizza_counter/pizza_bloc.dart';
 import 'package:flutter_bloc_pizza/models/pizza.dart';
 
 void main() {
@@ -17,7 +17,10 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (context) => PizzaCounterCubit(),
+          create: (context) => PizzaBloc()
+            ..add(
+              LoadPizzaCounter(),
+            ),
         ),
       ],
       child: const MaterialApp(
@@ -41,38 +44,47 @@ class HomeScreen extends StatelessWidget {
         backgroundColor: Colors.orange[800],
       ),
       body: Center(
-        child: BlocBuilder<PizzaCounterCubit, PizzaCounterState>(
+        child: BlocBuilder<PizzaBloc, PizzaState>(
           builder: (context, state) {
-            return Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  '${state.pizzas.length}',
-                  style: const TextStyle(fontSize: 45),
-                ),
-                const SizedBox(height: 20),
-                SizedBox(
-                  height: 500,
-                  width: 500,
-                  child: Stack(
-                    alignment: Alignment.center,
-                    clipBehavior: Clip.none,
-                    children: [
-                      for (int index = 0; index < state.pizzas.length; index++)
-                        Positioned(
-                          left: random.nextInt(400).toDouble(),
-                          top: random.nextInt(400).toDouble(),
-                          child: SizedBox(
-                            height: 50,
-                            width: 50,
-                            child: state.pizzas[index].image,
-                          ),
-                        )
-                    ],
+            if (state is PizzaLoading) {
+              return const CircularProgressIndicator(color: Colors.orange);
+            }
+            if (state is PizzaLoaded) {
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    '${state.pizzas.length}',
+                    style: const TextStyle(fontSize: 45),
                   ),
-                ),
-              ],
-            );
+                  const SizedBox(height: 20),
+                  SizedBox(
+                    height: 500,
+                    width: 500,
+                    child: Stack(
+                      alignment: Alignment.center,
+                      clipBehavior: Clip.none,
+                      children: [
+                        for (int index = 0;
+                            index < state.pizzas.length;
+                            index++)
+                          Positioned(
+                            left: random.nextInt(400).toDouble(),
+                            top: random.nextInt(400).toDouble(),
+                            child: SizedBox(
+                              height: 50,
+                              width: 50,
+                              child: state.pizzas[index].image,
+                            ),
+                          )
+                      ],
+                    ),
+                  ),
+                ],
+              );
+            } else {
+              return const Text('Something went wrong!');
+            }
           },
         ),
       ),
@@ -83,7 +95,7 @@ class HomeScreen extends StatelessWidget {
             child: const Icon(Icons.local_pizza),
             backgroundColor: Colors.orange[800],
             onPressed: () {
-              context.read<PizzaCounterCubit>().increment(Pizza.pizzas[0]);
+              context.read<PizzaBloc>().add(AddPizza(Pizza.pizzas[0]));
             },
           ),
           const SizedBox(height: 10),
@@ -91,9 +103,16 @@ class HomeScreen extends StatelessWidget {
             child: const Icon(Icons.local_pizza_outlined),
             backgroundColor: Colors.orange[500],
             onPressed: () {
-              context.read<PizzaCounterCubit>().increment(Pizza.pizzas[1]);
+              context.read<PizzaBloc>().add(AddPizza(Pizza.pizzas[1]));
             },
           ),
+          // FloatingActionButton(
+          //   child: const Icon(Icons.local_pizza_outlined),
+          //   backgroundColor: Colors.orange[500],
+          //   onPressed: () {
+          //     context.read<PizzaBloc>().add(RemovePizza(Pizza.pizzas[1]));
+          //   },
+          // ),
         ],
       ),
     );
