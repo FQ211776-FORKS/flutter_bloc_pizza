@@ -2,11 +2,19 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_bloc_pizza/bloc_observer.dart';
 import 'package:flutter_bloc_pizza/blocs/pizza_counter/pizza_bloc.dart';
 import 'package:flutter_bloc_pizza/models/pizza.dart';
 
 void main() {
-  runApp(const MyApp());
+  return BlocOverrides.runZoned(
+    () {
+      runApp(
+        const MyApp(),
+      );
+    },
+    blocObserver: PizzaBlocObserver(),
+  );
 }
 
 class MyApp extends StatelessWidget {
